@@ -18,19 +18,31 @@ candidatos = [["R.J. MacReady", 1, 5, 6], ["Nauls", 1, 2], ["Childs", 3, 7],
               ["Dr. Copper", 2, 4], ["George Bennings", 1, 3], ["Garry", 2, 6, 3]]
 
 
-def _menorCantidadExpedicionarios(l, cubiertos, solucionActual):
+def _menorCantidadExpedicionarios(listaCandidatos, cubiertos, solucionActual):
+    if len(cubiertos) == len(solucionActual):
+        return
 
-
-def menorCantidadExpedicionarios(c, t):
-    lista = sorted(c, key=len, reverse=True)
+def menorCantidadExpedicionarios(candidatos, tareas):
+    lista = sorted(candidatos, key=len, reverse=True)
     puestosCubiertos = set()
-    for i in range(len(tareas)):
-        puestosCubiertos.add(i)
-    mejorSolucionActual = []
-    for i in lista:
-        mejorSolucionActual.append(i[0])
+    mejorSolucionActual = set()
+    candidatosOrdenados = []
+    tareasOrdenadas = []
+    for l in lista:
+        candidatosOrdenados.append(l[0])
+        tareasOrdenadas.append(l[1:])
 
-    return _menorCantidadExpedicionarios(lista, puestosCubiertos, mejorSolucionActual):
+    for t in range(len(tareasOrdenadas)):
+        for j in tareasOrdenadas[t]:
+            if j not in puestosCubiertos:
+                puestosCubiertos.add(j)
+                mejorSolucionActual.add(candidatosOrdenados[t])
+    print(lista)
+    print(candidatosOrdenados)
+    print(tareasOrdenadas)
+    print(mejorSolucionActual)
+    print(puestosCubiertos)
+    #return _menorCantidadExpedicionarios(lista, puestosCubiertos, mejorSolucionActual)
 
 
 menorCantidadExpedicionarios(candidatos, tareas)
