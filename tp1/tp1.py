@@ -11,12 +11,15 @@
 # Nos solicitan que los ayudemos a resolver el problema intentando seleccionar
 # a la menor cantidad de expedicionarios, sin dejar de cubrir los requerimientos. (Branch and Bound)
 
+
 tareas = ["Cocinar", "Primeros auxilios",
           "Meteorología", "astronomía", "Electricidad", "Mecanico", "Programador"]
 candidatos = [["R.J. MacReady", 1, 5, 6], ["Nauls", 1, 2], ["Childs", 3, 7],
               ["Dr. Copper", 2, 4], ["George Bennings", 1, 3], ["Garry", 2, 6, 3]]
 
+[ childs, cooper, macready]
 
+    #https://docs.google.com/document/d/1wXAO5pavAgGTnVFEGN96WoUL4Mt--S38csLr9-YKiqg/edit
 def _menorCantidadExpedicionarios(solucionActual, candidatos, puestosCubiertos, cantidadTareas):
     if len(puestosCubiertos) == cantidadTareas:
         return solucionActual
@@ -41,35 +44,17 @@ def ordenarPorAportes(candidatos, puestosCubiertos):
     return sorted(nuevosCandidatos, key=len, reverse=True)
 
 def agregarCandidato(candidatos, puestosCubiertos, solucion):
-    salucion.append(candidatos[0][0])
+    solucion.append(candidatos[0][0])
     for i in candidatos[0]:
         if i == candidatos[0][0]:
             continue
         puestosCubiertos.add(i)
 
-
-# def menorCantidadExpedicionarios(candidatos, tareas):
-#     lista = sorted(candidatos, key=len, reverse=True)
-#     puestosCubiertos = set()
-#     mejorSolucionActual = set()
-#     candidatosOrdenados = []
-#     tareasOrdenadas = []
-#     for l in lista:
-#         candidatosOrdenados.append(l[0])
-#         tareasOrdenadas.append(l[1:])
-#     for t in range(len(tareasOrdenadas)):
-#         for j in tareasOrdenadas[t]:
-#             if j not in puestosCubiertos:
-#                 puestosCubiertos.add(j)
-#                 mejorSolucionActual.add(candidatosOrdenados[t])
-#     tam = len(puestosCubiertos)
-#     puestosCubiertos = set()
-#     return _menorCantidadExpedicionarios(candidatosOrdenados, tareasOrdenadas, puestosCubiertos, mejorSolucionActual,[], tam)
+def menorCantidadExpedicionarios(candidatos, tareas):
+    copiaCandidatos = candidatos.copy()
+    puestosCubiertos = set()
+    mejorSolucionActual = []
+    return _menorCantidadExpedicionarios(mejorSolucionActual, copiaCandidatos, puestosCubiertos, len(tareas))
 
 
-puestosCubiertos = set()
-print(ordenarPorAportes(candidatos, puestosCubiertos))
-puestosCubiertos.add(1)
-puestosCubiertos.add(5)
-puestosCubiertos.add(6)
-print(ordenarPorAportes(candidatos, puestosCubiertos))
+print(menorCantidadExpedicionarios(candidatos, tareas))
