@@ -17,7 +17,47 @@ tareas = ["Cocinar", "Primeros auxilios",
 candidatos = [["R.J. MacReady", 1, 5, 6], ["Nauls", 1, 2], ["Childs", 3, 7],
               ["Dr. Copper", 2, 4], ["George Bennings", 1, 3], ["Garry", 2, 6, 3]]
 
-[ childs, cooper, macready]
+#[ childs, cooper, macready]
+
+class PuestosCubiertos:
+    def __init__(self, listaPuestos):
+        self._puestos = {}
+        for i in listaPuestos:
+            self._puestos[i] = 0
+
+    def cubrirPuestos(self, puestos):
+        for i in puestos:
+            if i not in self._puestos:
+                return False
+            self._puestos[i] += 1
+        return  True
+
+    def liberarPuestos(self, puestos):
+        for i in puestos:
+            if i not in self._puestos:
+                return False
+            if self._puestos[i] == 0:
+                continue
+            self._puestos[i] -= 1
+        return True
+
+    def puestosCubiertos(self):
+        aux = []
+        for i in self._puestos:
+            if self._puestos[i] > 0:
+                aux.append(i)
+        return aux
+
+    def __len__(self):
+        tam = 0
+        for i in self._puestos:
+            if self._puestos[i] > 0:
+                tam+= 1
+        return tam
+
+    def __str__(self):
+        return str(self.puestosCubiertos())
+
 
     #https://docs.google.com/document/d/1wXAO5pavAgGTnVFEGN96WoUL4Mt--S38csLr9-YKiqg/edit
 def _menorCantidadExpedicionarios(solucionActual, candidatos, puestosCubiertos, cantidadTareas):
@@ -26,22 +66,10 @@ def _menorCantidadExpedicionarios(solucionActual, candidatos, puestosCubiertos, 
     if len(candidatos) == 0:
         return None
 
-    candidatos = ordenarPorAportes(candidatos, puestosCubiertos)
-    agregarCandidato(candidatos, puestosCubiertos, solucionActual)
-    return _menorCantidadExpedicionarios(solucionActual, candidatos[1:], puestosCubiertos, cantidadTareas)
-
-def ordenarPorAportes(candidatos, puestosCubiertos):
-    """devuelve una lista nueva con los candidatos reordenados segun los puestos que faltan cubrir.
-    no toca la lista de candidatos ni los puestos cubiertos"""
-    nuevosCandidatos = []
-    for c in candidatos: #O(n) n: cantidad de candidatos
-        aux = []
-        for t in c:
-            if t not in puestosCubiertos:
-                aux.append(t)
-        if len(aux) > 1:
-            nuevosCandidatos.append(aux)
-    return sorted(nuevosCandidatos, key=len, reverse=True)
+def ordenarPorAportes(candidatos):
+    """devuelve una lista nueva con los candidatos de mayor a menor cantidad de trabajos q hacen.
+    no toca la lista de candidatos original"""
+    return sorted(candidatos, key=len, reverse=True)
 
 def agregarCandidato(candidatos, puestosCubiertos, solucion):
     solucion.append(candidatos[0][0])
@@ -52,9 +80,13 @@ def agregarCandidato(candidatos, puestosCubiertos, solucion):
 
 def menorCantidadExpedicionarios(candidatos, tareas):
     copiaCandidatos = candidatos.copy()
-    puestosCubiertos = set()
+    puestos = []
     mejorSolucionActual = []
+    for i in range(1, len(tareas)+1):
+        puestos.append(i)
+    puestosCubiertos = PuestosCubiertos(puestos)
+    for i in candidatos:
+        mejorSolucionActual.append(i[0])
     return _menorCantidadExpedicionarios(mejorSolucionActual, copiaCandidatos, puestosCubiertos, len(tareas))
 
-
-print(menorCantidadExpedicionarios(candidatos, tareas))
+menorCantidadExpedicionarios(candidatos,tareas)
