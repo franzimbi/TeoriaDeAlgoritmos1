@@ -89,4 +89,22 @@ def menorCantidadExpedicionarios(candidatos, tareas):
         mejorSolucionActual.append(i[0])
     return _menorCantidadExpedicionarios(mejorSolucionActual, copiaCandidatos, puestosCubiertos, len(tareas))
 
-menorCantidadExpedicionarios(candidatos,tareas)
+# Jorge,2,6,1,4,3,5,7,8
+# Diego,1,3,5,4,8,2,6,7
+# Daniela,7,8,2,1,4,3,5,6
+# Thiago,8,1,5,7,2,6,3,4
+# Marcela,8,1,7,2,5,3,4,6
+
+
+# Daniela,7,8,2,1,4,3,5,6
+
+#1,3      ,5,4         ,8,2  ,6,7
+def _parejaInversiones(capitan, candidato):
+    if len(candidato)<=1:
+        return candidato
+
+    return swap(_parejaInversiones(capitan, candidato[:len(candidato)/2]), _parejaInversiones(capitan, candidato[len(candidato)/2:]))
+
+
+def parejaComplementadora(capitan, candidatos):
+    for i in candidatos:
