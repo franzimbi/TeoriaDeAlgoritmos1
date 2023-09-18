@@ -106,5 +106,35 @@ def _parejaInversiones(capitan, candidato):
     return swap(_parejaInversiones(capitan, candidato[:len(candidato)/2]), _parejaInversiones(capitan, candidato[len(candidato)/2:]))
 
 
-def parejaComplementadora(capitan, candidatos):
-    for i in candidatos:
+def mergesortContador(arr):
+    if len(arr) <= 1:
+        return (arr, 0)
+
+    mitad = len(arr) // 2
+    ladoIzq, contIzq = mergesortContador(arr[:mitad])
+    ladoDer, contDer = mergesortContador(arr[mitad:])
+    res, contRes = merge(ladoIzq, ladoDer)
+    return (res, contRes + contIzq + contDer)
+
+def merge(izq, der):
+    res = []
+    contador = 0
+    i, d = 0, 0
+
+    while i < len(izq) and d < len(der):
+        if izq[i] <= der[d]:
+            res.append(izq[i])
+            i += 1
+        else:
+            res.append(der[d])
+            contador += 1
+            d += 1
+
+    res.extend(izq[i:])
+    res.extend(der[d:])
+    #FALTA SUMAR ALGO ACA PARA QUE DE
+    return res, contador
+
+print(str(mergesortContador([6,8,7,2,1,5,3,4])) + " == 19")
+print(str(mergesortContador([8,7,6,5,4,3,2,1]))  + " == 28")
+print(str(mergesortContador([1,2,3,4,5,6,7,8]))  + " == 0")
