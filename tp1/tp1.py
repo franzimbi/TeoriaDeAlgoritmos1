@@ -89,53 +89,5 @@ def menorCantidadExpedicionarios(candidatos, tareas):
         mejorSolucionActual.append(i[0])
     return _menorCantidadExpedicionarios(mejorSolucionActual, copiaCandidatos, puestosCubiertos, len(tareas))
 
-# Jorge,2,6,1,4,3,5,7,8
-# Diego,1,3,5,4,8,2,6,7
-# Daniela,7,8,2,1,4,3,5,6
-# Thiago,8,1,5,7,2,6,3,4
-# Marcela,8,1,7,2,5,3,4,6
 
-def parejaInversiones(capitan, candidatos):
-    dicCategorias = {}
-    nombreCapitan = capitan.pop(0)
-    nombreComplemento = ''
-    cantidadInversiones = 0
-    for i in range(len(capitan)):
-        dicCategorias[capitan[i]] = i
-    for c in candidatos:
-        if c[0] == nombreCapitan:
-            continue
-        nombreActual = c[0]
-        c.pop(0)
-        _, aux = mergesortContador(c, dicCategorias)
-        if aux >= cantidadInversiones:
-            nombreComplemento = nombreActual
-            cantidadInversiones = aux
-    return nombreCapitan +',' + nombreComplemento
-
-def mergesortContador(arr, dic):
-    if len(arr) <= 1:
-        return (arr, 0)
-
-    mitad = len(arr) // 2
-    ladoIzq, contIzq = mergesortContador(arr[:mitad], dic)
-    ladoDer, contDer = mergesortContador(arr[mitad:], dic)
-    res, contRes = merge(ladoIzq, ladoDer, dic)
-    return (res, contRes + contIzq + contDer)
-
-def merge(izq, der, dic):
-    res = []
-    contador = 0
-    i, d = 0, 0
-    while i < len(izq) and d < len(der):
-        if dic[izq[i]] <= dic[der[d]]:
-            res.append(izq[i])
-            i += 1
-        else:
-            res.append(der[d])
-            contador += len(izq) - i
-            d += 1
-    res.extend(izq[i:])
-    res.extend(der[d:])
-    return res, contador
 
