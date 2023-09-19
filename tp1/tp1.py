@@ -95,15 +95,9 @@ def menorCantidadExpedicionarios(candidatos, tareas):
 # Thiago,8,1,5,7,2,6,3,4
 # Marcela,8,1,7,2,5,3,4,6
 
+def parejaInversiones(capitan, candidato):
+    for i in range(len(capitan)):
 
-# Daniela,7,8,2,1,4,3,5,6
-
-#1,3      ,5,4         ,8,2  ,6,7
-def _parejaInversiones(capitan, candidato):
-    if len(candidato)<=1:
-        return candidato
-
-    return swap(_parejaInversiones(capitan, candidato[:len(candidato)/2]), _parejaInversiones(capitan, candidato[len(candidato)/2:]))
 
 
 def mergesortContador(arr):
@@ -127,12 +121,11 @@ def merge(izq, der):
             i += 1
         else:
             res.append(der[d])
-            contador += 1
+            contador += len(izq) - i
             d += 1
 
     res.extend(izq[i:])
     res.extend(der[d:])
-    #FALTA SUMAR ALGO ACA PARA QUE DE
     return res, contador
 
 print(str(mergesortContador([6,8,7,2,1,5,3,4])) + " == 19")
