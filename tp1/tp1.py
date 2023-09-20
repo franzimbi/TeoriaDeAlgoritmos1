@@ -89,5 +89,7 @@ def menorCantidadExpedicionarios(candidatos, tareas):
         mejorSolucionActual.append(i[0])
     return _menorCantidadExpedicionarios(mejorSolucionActual, copiaCandidatos, puestosCubiertos, len(tareas))
 
+#################################################################################################################
+
 
 

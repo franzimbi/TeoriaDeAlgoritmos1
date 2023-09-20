@@ -17,36 +17,40 @@ def parejaInversiones(capitan, candidatos):
             continue
         nombreActual = c[0]
         c.pop(0)
-        _, aux = mergesortContador(c, categorias)
+        _, aux = mergesortContador(c,0, len(c)-1, categorias)
         if aux >= cantidadInversiones:
             nombreComplemento = nombreActual
             cantidadInversiones = aux
     return nombreCapitan +',' + nombreComplemento
 
-def mergesortContador(arr, dic):
-    if len(arr) <= 1:
-        return (arr, 0)
+def mergesortContador(arr, ini, fin, dic):
+    if ini >= fin:
+        return (arr[ini], 0)
 
-    mitad = len(arr) // 2
-    ladoIzq, contIzq = mergesortContador(arr[:mitad], dic)
-    ladoDer, contDer = mergesortContador(arr[mitad:], dic)
-    res, contRes = merge(ladoIzq, ladoDer, dic)
+    mitad = (ini+fin) // 2
+    ladoIzq, contIzq = mergesortContador(arr, ini, mitad, dic)
+    ladoDer, contDer = mergesortContador(arr, mitad+1, fin, dic)
+    res, contRes = merge(arr, ini, mitad, fin, dic)
     return (res, contRes + contIzq + contDer)
 
-def merge(izq, der, dic):
+def merge(arr, ini, mitad, fin, dic):
     res = []
     contador = 0
-    i, d = 0, 0
-    while i < len(izq) and d < len(der):
-        if dic[izq[i]] <= dic[der[d]]:
-            res.append(izq[i])
+    i, d = 0, mitad + 1
+    while i <= mitad and d <= fin:
+        if dic[arr[i]] <= dic[arr[d]]:
+            res.append(arr[i])
             i += 1
         else:
-            res.append(der[d])
-            contador += len(izq) - i
+            res.append(arr[d])
+            contador += mitad - i + 1
             d += 1
-    res.extend(izq[i:])
-    res.extend(der[d:])
+    while i <= mitad:
+        res.append(arr[i])
+        i += 1
+    while d <= fin:
+        res.append(arr[d])
+        d += 1
     return res, contador
 
 #   ~~ main ~~
@@ -67,5 +71,5 @@ for l in lineas:
 if int(argumentos[2]) - 2 > len(argumentos) or int(argumentos[2]) - 1 < 0 :
     print("ERROR")
     sys.exit()
-capitan = lista.pop(int(argumentos[2]) - 1 )
+capitan = lista.pop(int(argumentos[2]) - 1)
 print(parejaInversiones(capitan, lista))
