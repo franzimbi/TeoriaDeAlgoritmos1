@@ -23,34 +23,32 @@ def ordenarCandidatos(candidatos, cantidadTareas):  # O(C * T)
             if not agregado:
                 res.append(candidato)
     return res
-def branchAndBound(candidatos, puestos):
-    def _bAb(indice, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos):
-        if len(puestosCubiertos) == cantidadPuestos:
-            return solucionActual
-        if indice == len(candidatos) or len(solucionActual) >= len(mejorSolucion):
-            return None
-        c = candidatos[indice]
-        puestos = set(c[1:])
-        puestoOfrecido = puestos - puestosCubiertos
-        if len(puestoOfrecido) > 0:
-            solucionActual.append(c[0])
-            puestosCubiertos |= puestoOfrecido
-            s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
-            if s != None and len(s) < len(mejorSolucion):
-                mejorSolucion = s.copy()
-            solucionActual.remove(c[0])
-            puestosCubiertos -= puestoOfrecido
-            s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
-            if s != None and len(s) < len(mejorSolucion):
-                mejorSolucion = s.copy()
-        return mejorSolucion
 
+def _bAb(indice, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos):
+    if len(puestosCubiertos) == cantidadPuestos:
+        return solucionActual
+    if indice == len(candidatos) or len(solucionActual) >= len(mejorSolucion):
+        return None
+    c = candidatos[indice]
+    puestoOfrecido = set(c[1:]) - puestosCubiertos
+    if len(puestoOfrecido) > 0:
+        solucionActual.append(c[0])
+        puestosCubiertos |= puestoOfrecido
+        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
+        if s != None and len(s) < len(mejorSolucion):
+                mejorSolucion = s.copy()
+        solucionActual.remove(c[0])
+        puestosCubiertos -= puestoOfrecido
+        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
+        if s != None and len(s) < len(mejorSolucion):
+            mejorSolucion = s.copy()
+    return mejorSolucion
+def personalOptimo(candidatos, puestos):
     candidatosOrdenados = ordenarCandidatos(candidatos, len(puestos))
-    puestosCubiertos = set()
     mejorSolucion = []
     for i in candidatosOrdenados:
         mejorSolucion.append(i[0])
-    return  _bAb(0, candidatosOrdenados, puestosCubiertos, [], mejorSolucion, len(puestos))
+    return _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
 
 
 ######### MAIN #############
@@ -80,7 +78,7 @@ for l in lineas:
         aux.append(int(i))
     listaCandidatos.append(aux)
 
-res = branchAndBound(listaCandidatos, listaIdTareas)
+res = personalOptimo(listaCandidatos, listaIdTareas)
 
 for i in res:
     print(i)
