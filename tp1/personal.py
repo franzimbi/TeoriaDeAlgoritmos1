@@ -24,22 +24,22 @@ def ordenarCandidatos(candidatos, cantidadTareas):  # O(C * T)
                 res.append(candidato)
     return res
 
-def _bAb(indice, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos):
+def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos):
     if len(puestosCubiertos) == cantidadPuestos:
-        return solucionActual
-    if indice == len(candidatos) or len(solucionActual) >= len(mejorSolucion):
+        return solucionParcial
+    if indice == len(candidatos) or len(solucionParcial) >= len(mejorSolucion):
         return None
     c = candidatos[indice]
     puestoOfrecido = set(c[1:]) - puestosCubiertos
     if len(puestoOfrecido) > 0:
-        solucionActual.append(c[0])
+        solucionParcial.append(c[0])
         puestosCubiertos |= puestoOfrecido
-        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
+        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
         if s != None and len(s) < len(mejorSolucion):
                 mejorSolucion = s.copy()
-        solucionActual.remove(c[0])
+        solucionParcial.remove(c[0])
         puestosCubiertos -= puestoOfrecido
-        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionActual, mejorSolucion, cantidadPuestos)
+        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
         if s != None and len(s) < len(mejorSolucion):
             mejorSolucion = s.copy()
     return mejorSolucion
