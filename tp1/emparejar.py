@@ -1,10 +1,4 @@
 import sys
-#   Se está por realizar un concurso de conocimientos en parejas para escuelas secundarias.
-#   Existen “n” categorías que se evaluarán en el mismo. Una escuela evaluó a sus posibles
-#   participantes. Por cada uno de ellos generaron una lista ordenada de mayor a menor de
-#   las categorías según sus conocimientos. En base a una competencia interna se seleccionó
-#   a uno de ellos como el capitán. Nos solicitan que los ayudemos, basándonos en el concepto
-#   de inversión, a seleccionar a otro participante que mejor se complemente con el capitán.
 def parejaInversiones(capitan, candidatos):
     categorias = {}
     nombreCapitan = capitan.pop(0)

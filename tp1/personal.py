@@ -1,10 +1,4 @@
-import time
-tareas = ["Cocinar", "Primeros auxilios",
-          "Meteorología", "astronomía", "Electricidad", "Mecanico", "Programador"]
-candidatos = [["R.J. MacReady", 1, 5, 6], ["Nauls", 1, 2], ["Childs", 3, 7],
-              ["Dr. Copper", 2, 4], ["George Bennings", 1, 3], ["Garry", 2, 6, 3]]
-
-#[ childs, cooper, macready]
+import sys
 def ordenarCandidatos(candidatos, cantidadTareas):  # O(C * T)
     ordenPorCantidad = list([] for _ in range(cantidadTareas)) # O(T) t: cantidad de tareas
     contador = [0]*cantidadTareas # O(n) n: cantidad de candidatos
@@ -58,10 +52,42 @@ def branchAndBound(candidatos, puestos):
         mejorSolucion.append(i[0])
     return  _bAb(0, candidatosOrdenados, puestosCubiertos, [], mejorSolucion, len(puestos))
 
-inicio = time.time()
 
-print(branchAndBound(candidatos, tareas))
+######### MAIN #############
 
-fin = time.time()
-tiempo_transcurrido = (fin - inicio)*1000
-print("Tiempo de ejecución: {:.6f} milisegundos".format(tiempo_transcurrido))
+tareas = ["Cocinar", "Primeros auxilios",
+              "Meteorología", "astronomía", "Electricidad", "Mecanico", "Programador"]
+candidatos = [["R.J. MacReady", 1, 5, 6], ["Nauls", 1, 2], ["Childs", 3, 7],
+                  ["Dr. Copper", 2, 4], ["George Bennings", 1, 3], ["Garry", 2, 6, 3]]
+
+argumentos = sys.argv
+if len(argumentos) != 3:
+    print("ERROR")
+    sys.exit()
+
+with open(argumentos[1], 'r') as archivo:
+    lineas = archivo.readlines()
+listaTareas = []
+listaIdTareas = []
+
+for l in lineas:
+    elementos = l.strip().split(',')
+    listaTareas.append(elementos[1])
+    listaIdTareas.append(int(elementos[0]))
+
+with open(argumentos[2], 'r') as archivo:
+    lineas = archivo.readlines()
+listaCandidatos = []
+for l in lineas:
+    elementos = l.strip().split(',')
+    aux = []
+    aux.append(elementos.pop(0))
+    for i in elementos:
+        aux.append(int(i))
+    listaCandidatos.append(aux)
+
+res = branchAndBound(listaCandidatos, listaIdTareas)
+
+for i in res:
+    print(i)
+
