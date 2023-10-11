@@ -1,42 +1,25 @@
+import math
 import sys
-def ordenarCandidatos(candidatos, cantidadTareas):  # O(C * T)
-    ordenPorCantidad = list([] for _ in range(cantidadTareas)) # O(T) t: cantidad de tareas
-    contador = [0]*cantidadTareas # O(n) n: cantidad de candidatos
-    puestosUnicos = set()
-    for candidato in candidatos: #O (n)
-        ordenPorCantidad[len(candidato)-1].append(candidato)
-        for tarea in candidato:
-            if tarea!=candidato[0]:
-                contador[tarea-1] += 1
-    for i in range(len(contador)): # O(T)
-        if contador[i] == 1:
-            puestosUnicos.add(i+1)
-    res = []
-    for i in range(len(ordenPorCantidad)-1, 0 , -1):  # O(n)
-        for candidato in ordenPorCantidad[i]: # O(T)
-            agregado = False
-            for c in candidato:
-                if c in puestosUnicos:
-                    res.insert(0, candidato)
-                    agregado = True
-                    break
-            if not agregado:
-                res.append(candidato)
-    return res
+
+def funcionCosto(proxCandidato, cantidadTareas, puestosCubiertos):
+    aux = cantidadTareas - len(puestosCubiertos)
+    return math.ceil(aux/(len(proxCandidato)-1)) # redondea para arriba
 
 def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos):
     if len(puestosCubiertos) == cantidadPuestos:
         return solucionParcial
-    if indice == len(candidatos) or len(solucionParcial) >= len(mejorSolucion):
+    if indice == len(candidatos):
         return None
-    c = candidatos[indice]
-    puestoOfrecido = set(c[1:]) - puestosCubiertos
-    if len(puestoOfrecido) > 0:
+    costo = funcionCosto(candidatos[indice], cantidadPuestos, puestosCubiertos)
+    if len(solucionParcial) + costo <= len(mejorSolucion):
+    # si el costo minimo es mayor al costo de la mejor solucion, podamos
+        c = candidatos[indice]
+        puestoOfrecido = set(c[1:]) - puestosCubiertos
         solucionParcial.append(c[0])
         puestosCubiertos |= puestoOfrecido
         s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
         if s != None and len(s) < len(mejorSolucion):
-                mejorSolucion = s.copy()
+            mejorSolucion = s.copy()
         solucionParcial.remove(c[0])
         puestosCubiertos -= puestoOfrecido
         s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
@@ -44,7 +27,7 @@ def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, c
             mejorSolucion = s.copy()
     return mejorSolucion
 def personalOptimo(candidatos, puestos):
-    candidatosOrdenados = ordenarCandidatos(candidatos, len(puestos))
+    candidatosOrdenados = sorted(candidatos, key=len, reverse=True) #ordeno candidatos de los q mas trabajos hacen a menos
     mejorSolucion = []
     for i in candidatosOrdenados:
         mejorSolucion.append(i[0])
