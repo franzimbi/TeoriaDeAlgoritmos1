@@ -7,9 +7,10 @@ def funcionCosto(proxCandidato, cantidadTareas, puestosCubiertos):
 
 def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos):
     if len(puestosCubiertos) == cantidadPuestos:
-        return solucionParcial
+        return solucionParcial, len(puestosCubiertos)
     if indice == len(candidatos):
-        return None
+        return None, 0
+    contadorPuestos = 0
     costo = funcionCosto(candidatos[indice], cantidadPuestos, puestosCubiertos)
     if len(solucionParcial) + costo <= len(mejorSolucion):
     # si el costo minimo es mayor al costo de la mejor solucion, podamos
@@ -17,21 +18,26 @@ def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, c
         puestoOfrecido = set(c[1:]) - puestosCubiertos
         solucionParcial.append(c[0])
         puestosCubiertos |= puestoOfrecido
-        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
+        s, tam = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
         if s != None and len(s) < len(mejorSolucion):
             mejorSolucion = s.copy()
+            contadorPuestos = tam
         solucionParcial.remove(c[0])
         puestosCubiertos -= puestoOfrecido
-        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
+        s, tam = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
         if s != None and len(s) < len(mejorSolucion):
             mejorSolucion = s.copy()
-    return mejorSolucion
+            contadorPuestos = tam
+    return mejorSolucion, contadorPuestos
 def personalOptimo(candidatos, puestos):
     candidatosOrdenados = sorted(candidatos, key=len, reverse=True) #ordeno candidatos de los q mas trabajos hacen a menos
     mejorSolucion = []
     for i in candidatosOrdenados:
         mejorSolucion.append(i[0])
-    return _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
+    solucion, t = _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
+    if t != len(puestos):
+        return None
+    return solucion
 
 
 ######### MAIN #############
@@ -62,7 +68,9 @@ for l in lineas:
     listaCandidatos.append(aux)
 
 res = personalOptimo(listaCandidatos, listaIdTareas)
-
-for i in res:
-    print(i)
+if res == None:
+    print("No tiene solucion")
+else:
+    for i in res:
+        print(i)
 
