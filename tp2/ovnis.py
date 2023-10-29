@@ -1,4 +1,5 @@
 import random
+import sys
 from collections import deque
 
 class Grafo:
@@ -213,27 +214,58 @@ def eliminarCiclosParaRedDeFlujo(grafo):
         copia.insertarArista(v, str(v) + str(w), peso)
         copia.insertarArista(str(v) + str(w), w, peso)
     return copia
+def flujoMaximo(flujo, t):
+    max = 0
+    for i in flujo:
+        u,v = i
+        if v == t:
+            max += flujo[(u,v)]
+    return max
 
-grafito = Grafo(True, True)
+def construirRed(aristas):
+    red = Grafo(True, True)
+    aristasDeR = []
+    for a in aristas:
+        u,v, p = a
+        if u == 'R':
+            red.insertarVertice(u)
+            aristasDeR.append((u, v, p))
+        elif v == 'S':
+            red.insertarArista(u, v, p)
+        else:
+            red.insertarArista(u, v, p)
+            red.insertarArista(v, u, p)
+    return eliminarCiclosParaRedDeFlujo(red), aristasDeR
 
-"""grafito.insertarArista('S', 'A', 10)
-grafito.insertarArista('S', 'B', 8)
-grafito.insertarArista('S', 'C', 5)
-grafito.insertarArista('A', 'D', 12)
-grafito.insertarArista('B', 'D', 7)
-grafito.insertarArista('C', 'E', 6)
-grafito.insertarArista('E', 'B', 2)
-grafito.insertarArista('D', 'T', 15)
-grafito.insertarArista('E', 'T', 12)
-"""
-grafito.insertarArista('S', 'A', 10)
-grafito.insertarArista('S', 'B', 8)
-grafito.insertarArista('S', 'C', 5)
-grafito.insertarArista('C', 'S', 5)
-grafito.insertarArista('A', 'D', 12)
-grafito.insertarArista('B', 'D', 7)
-grafito.insertarArista('D', 'B', 7)
+def encontrarConexionOptima(red, aristasAProbar, s, t):
+    max = 0
+    aristaUsada = None
+    for i in aristasAProbar:
+        o, d, p = i
+        red.insertarArista(o,d,p)
+        maxLocal = flujoMaximo(fordFulkersonFlujoMaximo(red, s, t), t)
+        if maxLocal >= max:
+            max = maxLocal
+            aristaUsada = i
+        red.borrarArista(o,d)
+    return max, aristaUsada
 
 
-print(grafito)
-print(eliminarCiclosParaRedDeFlujo(grafito))
+# __ MAIN __
+argumentos = sys.argv
+if len(argumentos) != 2:
+    print("ERROR")
+    sys.exit()
+
+with open('red.txt', 'r') as archivo:
+    lineas = archivo.readlines()
+
+aristas = []
+for l in lineas:
+    elementos = l.strip().split(',')
+    aristas.append((str(elementos[0]), str(elementos[1]), int(elementos[2])))
+
+r, a = construirRed(aristas)
+max, aristaFinal = encontrarConexionOptima(r, a, 'R', 'S')
+print(max)
+print(aristaFinal)
