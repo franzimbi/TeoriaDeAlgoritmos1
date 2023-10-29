@@ -146,7 +146,10 @@ def reconstruirCamino(padres, destino):
     recorrido = []
     while destino is not None:
         recorrido.append(destino)
-        destino = padres[destino]
+        try:
+            destino = padres[destino]
+        except KeyError:
+            return None
     return recorrido[::-1]
 
 def bfsHasta(grafo, origen, destino):
@@ -184,7 +187,7 @@ def fordFulkersonFlujoMaximo(grafo, s, t):
     grafoResidual = copiarGrafo(grafo)
     camino = bfsHasta(grafoResidual, s, t)
     while camino is not None:
-        capacidadResidualCamino = minPeso(grafo, camino)
+        capacidadResidualCamino = minPeso(grafoResidual, camino)
         for i in range(1, len(camino)):
             if grafo.existeArista(camino[i-1], camino[i]):
                 flujo[(camino[i-1], camino[i])] += capacidadResidualCamino
@@ -192,12 +195,28 @@ def fordFulkersonFlujoMaximo(grafo, s, t):
             else:
                 flujo[(camino[i], camino[i-1])] -= capacidadResidualCamino
                 actualizarGrafoResidual(grafoResidual, camino[i], camino[i-1], capacidadResidualCamino)
-            camino = bfsHasta(grafoResidual, s, t)
+        camino = bfsHasta(grafoResidual, s, t)
     return flujo
+
+def eliminarCiclosParaRedDeFlujo(grafo):
+    copia = copiarGrafo(grafo)
+    aristasBi = set()
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            if grafo.existeArista(v, w) and grafo.existeArista(w, v):
+                if (v,w) not in aristasBi and (w,v) not in aristasBi:
+                    aristasBi.add((v,w))
+    for i in aristasBi:
+        v, w = i
+        peso = grafo.pesoArista(v,w)
+        copia.borrarArista(v,w)
+        copia.insertarArista(v, str(v) + str(w), peso)
+        copia.insertarArista(str(v) + str(w), w, peso)
+    return copia
 
 grafito = Grafo(True, True)
 
-grafito.insertarArista('S', 'A', 10)
+"""grafito.insertarArista('S', 'A', 10)
 grafito.insertarArista('S', 'B', 8)
 grafito.insertarArista('S', 'C', 5)
 grafito.insertarArista('A', 'D', 12)
@@ -206,5 +225,15 @@ grafito.insertarArista('C', 'E', 6)
 grafito.insertarArista('E', 'B', 2)
 grafito.insertarArista('D', 'T', 15)
 grafito.insertarArista('E', 'T', 12)
+"""
+grafito.insertarArista('S', 'A', 10)
+grafito.insertarArista('S', 'B', 8)
+grafito.insertarArista('S', 'C', 5)
+grafito.insertarArista('C', 'S', 5)
+grafito.insertarArista('A', 'D', 12)
+grafito.insertarArista('B', 'D', 7)
+grafito.insertarArista('D', 'B', 7)
 
-print(fordFulkersonFlujoMaximo(grafito, 'S', 'T'))
+
+print(grafito)
+print(eliminarCiclosParaRedDeFlujo(grafito))
