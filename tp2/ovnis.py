@@ -249,7 +249,7 @@ def corteMinimo(grafo, residual, s):
                 aristasCorteMinimo.append((v,w))
     return aristasCorteMinimo
 
-def encontrarConexionOptima(red, aristasAProbar, s, t):
+def     encontrarConexionOptima(red, aristasAProbar, s, t):
     max = 0
     aristaUsada = None
     aristasCorteMinimo = None
@@ -267,12 +267,12 @@ def encontrarConexionOptima(red, aristasAProbar, s, t):
 
 
 # __ MAIN __
-"""argumentos = sys.argv
+argumentos = sys.argv
 if len(argumentos) != 2:
     print("ERROR")
-    sys.exit()"""
+    sys.exit()
 
-with open('red.txt', 'r') as archivo:
+with open(argumentos[1], 'r') as archivo:
     lineas = archivo.readlines()
 
 aristas = []
