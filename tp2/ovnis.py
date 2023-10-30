@@ -197,7 +197,7 @@ def fordFulkersonFlujoMaximo(grafo, s, t):
                 flujo[(camino[i], camino[i-1])] -= capacidadResidualCamino
                 actualizarGrafoResidual(grafoResidual, camino[i], camino[i-1], capacidadResidualCamino)
         camino = bfsHasta(grafoResidual, s, t)
-    return flujo
+    return flujo, grafoResidual
 
 def eliminarCiclosParaRedDeFlujo(grafo):
     copia = copiarGrafo(grafo)
@@ -237,25 +237,40 @@ def construirRed(aristas):
             red.insertarArista(v, u, p)
     return eliminarCiclosParaRedDeFlujo(red), aristasDeR
 
+def corteMinimo(grafo, residual, s):
+    padres, origen = bfs(residual, s)
+    subConjuntoS = set()
+    aristasCorteMinimo = []
+    for i in padres:
+        subConjuntoS.add(i)
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            if v in subConjuntoS and w not in subConjuntoS:
+                aristasCorteMinimo.append((v,w))
+    return aristasCorteMinimo
+
 def encontrarConexionOptima(red, aristasAProbar, s, t):
     max = 0
     aristaUsada = None
+    aristasCorteMinimo = None
     for i in aristasAProbar:
         o, d, p = i
         red.insertarArista(o,d,p)
-        maxLocal = flujoMaximo(fordFulkersonFlujoMaximo(red, s, t), t)
+        flujo, residual = fordFulkersonFlujoMaximo(red, s, t)
+        maxLocal = flujoMaximo(flujo, t)
         if maxLocal >= max:
             max = maxLocal
             aristaUsada = i
+            aristasCorteMinimo = corteMinimo(red, residual, s)
         red.borrarArista(o,d)
-    return max, aristaUsada
+    return max, aristaUsada, aristasCorteMinimo
 
 
 # __ MAIN __
-argumentos = sys.argv
+"""argumentos = sys.argv
 if len(argumentos) != 2:
     print("ERROR")
-    sys.exit()
+    sys.exit()"""
 
 with open('red.txt', 'r') as archivo:
     lineas = archivo.readlines()
@@ -266,6 +281,7 @@ for l in lineas:
     aristas.append((str(elementos[0]), str(elementos[1]), int(elementos[2])))
 
 r, a = construirRed(aristas)
-max, aristaFinal = encontrarConexionOptima(r, a, 'R', 'S')
+max, aristaFinal, aristasLimitantes = encontrarConexionOptima(r, a, 'R', 'S')
 print(max)
 print(aristaFinal)
+print(aristasLimitantes)
