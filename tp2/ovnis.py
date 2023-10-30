@@ -249,7 +249,7 @@ def corteMinimo(grafo, residual, s):
                 aristasCorteMinimo.append((v,w))
     return aristasCorteMinimo
 
-def     encontrarConexionOptima(red, aristasAProbar, s, t):
+def encontrarConexionOptima(red, aristasAProbar, s, t):
     max = 0
     aristaUsada = None
     aristasCorteMinimo = None
