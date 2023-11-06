@@ -7,10 +7,9 @@ def funcionCosto(proxCandidato, cantidadTareas, puestosCubiertos):
 
 def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos):
     if len(puestosCubiertos) == cantidadPuestos:
-        return solucionParcial, len(puestosCubiertos)
+        return solucionParcial
     if indice == len(candidatos):
-        return None, 0
-    contadorPuestos = 0
+        return None
     costo = funcionCosto(candidatos[indice], cantidadPuestos, puestosCubiertos)
     if len(solucionParcial) + costo <= len(mejorSolucion):
     # si el costo minimo es mayor al costo de la mejor solucion, podamos
@@ -18,27 +17,33 @@ def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, c
         puestoOfrecido = set(c[1:]) - puestosCubiertos
         solucionParcial.append(c[0])
         puestosCubiertos |= puestoOfrecido
-        s, tam = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
-        if s != None and len(s) < len(mejorSolucion):
+        s= _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
+        if s != None:
             mejorSolucion = s.copy()
-            contadorPuestos = tam
         solucionParcial.remove(c[0])
         puestosCubiertos -= puestoOfrecido
-        s, tam = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
-        if s != None and len(s) < len(mejorSolucion):
+        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
+        if s != None:
             mejorSolucion = s.copy()
-            contadorPuestos = tam
-    return mejorSolucion, contadorPuestos
+    return mejorSolucion
+def chequeoSolucion(candidatos, solucion, puestos):
+    contador = set()
+    for i in candidatos:
+        if i[0] in solucion:
+            for j in range(1, len(i)):
+                contador.add(i[j])
+    return len(contador) == len(puestos)
+
 def personalOptimo(candidatos, puestos):
     candidatosOrdenados = sorted(candidatos, key=len, reverse=True) #ordeno candidatos de los q mas trabajos hacen a menos
     mejorSolucion = []
     for i in candidatosOrdenados:
         mejorSolucion.append(i[0])
-    solucion, t = _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
-    if t != len(puestos):
+    solucion = _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
+    if chequeoSolucion(candidatos, solucion, puestos):
+        return solucion
+    else:
         return None
-    return solucion
-
 
 ######### MAIN #############
 argumentos = sys.argv
