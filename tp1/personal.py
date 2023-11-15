@@ -4,18 +4,18 @@ import math
 import time
 
 
-def funcionCosto(proxCandidato, puestosCubiertos, cantidadTareas,):
-    aux = cantidadTareas - len(puestosCubiertos)
-    return math.ceil(aux/(len(proxCandidato)-1)) # redondea para arriba
+def funcionCosto(proxCandidato, puestosCubiertos, cantidadTareas):
+    puestosRestantes = cantidadTareas - len(puestosCubiertos)
+    return math.ceil(puestosRestantes/(len(proxCandidato)-1)) # redondea para arriba
 
 def _bAb(candidatos, cantidadPuestos):
     candidatos = sorted(candidatos, key=len, reverse=True)
     heap = []
-    heapq.heappush(heap, (0, 0, set(), []))  # (costoAcumulado, indice, puestosCubiertos, solucionActual)
+    heapq.heappush(heap, (0, [], 0, set()))  # (costoAcumulado, solucionActual, indice, puestosCubiertos)
     mejorSolucion = None
     cantidadCandidatos = len(candidatos)
     while len(heap) != 0:
-        costoAcumulado, indice, puestosCubiertos, solucionActual = heapq.heappop(heap)
+        costoAcumulado, solucionActual, indice, puestosCubiertos = heapq.heappop(heap)
         if mejorSolucion is not None and len(solucionActual) >= len(mejorSolucion):
             continue
         if len(puestosCubiertos) == cantidadPuestos:
@@ -27,10 +27,13 @@ def _bAb(candidatos, cantidadPuestos):
             costo = funcionCosto(c, puestosCubiertos, cantidadPuestos)
             if mejorSolucion is not None and costo + len(solucionActual) >= len(mejorSolucion):
                 continue
+            if cantidadCandidatos - indice < costo:
+                continue
             # sin agregar el candidato
-            heapq.heappush(heap, (costoAcumulado, indice + 1, puestosCubiertos.copy(), solucionActual.copy()))
-            # agregando el candidato
-            heapq.heappush(heap, (costoAcumulado + costo, indice + 1, puestosCubiertos | puestoOfrecido, solucionActual + [c[0]]))
+            heapq.heappush(heap, (costoAcumulado + 1, solucionActual.copy(), indice + 1, puestosCubiertos.copy()))
+            if len(puestoOfrecido) != 0:
+                # agregando el candidato
+                heapq.heappush(heap, (costoAcumulado + costo, solucionActual.copy() + [c[0]], indice + 1, puestosCubiertos | puestoOfrecido))
 
     return mejorSolucion
 
@@ -76,11 +79,13 @@ for l in lineas:
     for i in elementos:
         aux.append(int(i))
     listaCandidatos.append(aux)
-
+# ini = time.time()
 res = personalOptimo(listaCandidatos, listaIdTareas)
 if res == None:
     print("No tiene solucion")
 else:
     for i in res:
         print(i)
-
+# fin = time.time()
+#
+# print(str(1000*(fin-ini)) + " milisegundos")
