@@ -1,46 +1,51 @@
-import math
 import sys
+import heapq
+import math
+import time
 
-def funcionCosto(proxCandidato, cantidadTareas, puestosCubiertos):
+
+def funcionCosto(proxCandidato, puestosCubiertos, cantidadTareas,):
     aux = cantidadTareas - len(puestosCubiertos)
     return math.ceil(aux/(len(proxCandidato)-1)) # redondea para arriba
 
-def _bAb(indice, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos):
-    if len(puestosCubiertos) == cantidadPuestos:
-        return solucionParcial
-    if indice == len(candidatos):
-        return None
-    costo = funcionCosto(candidatos[indice], cantidadPuestos, puestosCubiertos)
-    if len(solucionParcial) + costo <= len(mejorSolucion):
-    # si el costo minimo es mayor al costo de la mejor solucion, podamos
-        c = candidatos[indice]
-        puestoOfrecido = set(c[1:]) - puestosCubiertos
-        solucionParcial.append(c[0])
-        puestosCubiertos |= puestoOfrecido
-        s= _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
-        if s != None:
-            mejorSolucion = s.copy()
-        solucionParcial.remove(c[0])
-        puestosCubiertos -= puestoOfrecido
-        s = _bAb(indice + 1, candidatos, puestosCubiertos, solucionParcial, mejorSolucion, cantidadPuestos)
-        if s != None:
-            mejorSolucion = s.copy()
+def _bAb(candidatos, cantidadPuestos):
+    candidatos = sorted(candidatos, key=len, reverse=True)
+    heap = []
+    heapq.heappush(heap, (0, 0, set(), []))  # (costoAcumulado, indice, puestosCubiertos, solucionActual)
+    mejorSolucion = None
+    cantidadCandidatos = len(candidatos)
+    while len(heap) != 0:
+        costoAcumulado, indice, puestosCubiertos, solucionActual = heapq.heappop(heap)
+        if mejorSolucion is not None and len(solucionActual) >= len(mejorSolucion):
+            continue
+        if len(puestosCubiertos) == cantidadPuestos:
+            mejorSolucion = solucionActual
+            continue
+        if indice < cantidadCandidatos:
+            c = candidatos[indice]
+            puestoOfrecido = set(c[1:]) - puestosCubiertos
+            costo = funcionCosto(c, puestosCubiertos, cantidadPuestos)
+            if mejorSolucion is not None and costo + len(solucionActual) >= len(mejorSolucion):
+                continue
+            # sin agregar el candidato
+            heapq.heappush(heap, (costoAcumulado, indice + 1, puestosCubiertos.copy(), solucionActual.copy()))
+            # agregando el candidato
+            heapq.heappush(heap, (costoAcumulado + costo, indice + 1, puestosCubiertos | puestoOfrecido, solucionActual + [c[0]]))
+
     return mejorSolucion
+
 def chequeoSolucion(candidatos, solucion, puestos):
-    contador = set()
-    for i in candidatos:
-        if i[0] in solucion:
-            for j in range(1, len(i)):
-                contador.add(i[j])
-    return len(contador) == len(puestos)
+    cubiertos = set()
+    for candidato in solucion:
+        for c in candidatos:
+            if c[0] == candidato:
+                cubiertos |= set(c[1:])
+                break
+    return cubiertos == set(puestos)
 
 def personalOptimo(candidatos, puestos):
-    candidatosOrdenados = sorted(candidatos, key=len, reverse=True) #ordeno candidatos de los q mas trabajos hacen a menos
-    mejorSolucion = []
-    for i in candidatosOrdenados:
-        mejorSolucion.append(i[0])
-    solucion = _bAb(0, candidatosOrdenados, set(), [], mejorSolucion, len(puestos))
-    if chequeoSolucion(candidatos, solucion, puestos):
+    solucion = _bAb(candidatos, len(puestos))
+    if solucion is not None and chequeoSolucion(candidatos, solucion, puestos):
         return solucion
     else:
         return None
