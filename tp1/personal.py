@@ -8,7 +8,7 @@ def funcionCosto(proxCandidato, puestosCubiertos, cantidadTareas):
     puestosRestantes = cantidadTareas - len(puestosCubiertos)
     return math.ceil(puestosRestantes/(len(proxCandidato)-1)) # redondea para arriba
 
-def _bAb(candidatos, cantidadPuestos):
+def bAb(candidatos, cantidadPuestos):
     candidatos = sorted(candidatos, key=len, reverse=True)
     heap = []
     heapq.heappush(heap, (0, [], 0, set()))  # (costoAcumulado, solucionActual, indice, puestosCubiertos)
@@ -47,7 +47,7 @@ def chequeoSolucion(candidatos, solucion, puestos):
     return cubiertos == set(puestos)
 
 def personalOptimo(candidatos, puestos):
-    solucion = _bAb(candidatos, len(puestos))
+    solucion = bAb(candidatos, len(puestos))
     if solucion is not None and chequeoSolucion(candidatos, solucion, puestos):
         return solucion
     else:
