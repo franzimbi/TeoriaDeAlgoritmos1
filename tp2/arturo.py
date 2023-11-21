@@ -21,8 +21,10 @@ def encontrarMaximo(arr):
 def construirCamino(optimos, caballeros):
     resultado = []
     pos = encontrarMaximo(optimos)
-    while pos > 0 and optimos[pos-1] >= 0:
+    max = optimos[pos]
+    while pos >= 0 and max > 0:
         resultado.append(caballeros[pos-1][0])
+        max -= caballeros[pos-1][1]
         pos -= 1
     return resultado
 
