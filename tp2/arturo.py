@@ -54,11 +54,11 @@ def caballerosMasPopulares(caballeros):
 
 # ___ MAIN ___
 argumentos = sys.argv
-# if len(argumentos) != 2:
-#     print("ERROR")
-#     sys.exit()
+if len(argumentos) != 2:
+    print("ERROR")
+    sys.exit()
 
-with open('caballeros.txt', 'r') as archivo:
+with open(argumentos[1], 'r') as archivo:
     lineas = archivo.readlines()
 
 listaCaballeros = []
