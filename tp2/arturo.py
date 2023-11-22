@@ -4,13 +4,11 @@ def valorCaballero(caballero):
     return caballero[1]
 def nombreCaballero(caballero):
     return caballero[0]
-def encontrarElUltimoNegativo(caballeros):
-    ultimo = -1
-    for i in range(len(caballeros)):
-        if valorCaballero(caballeros[i]) < 0:
-            ultimo = i
-    return ultimo
-
+def caballerosNegativos(caballeros):
+    aux = []
+    for i in caballeros:
+        aux.append((nombreCaballero(i), -1 * valorCaballero(i)))
+    return aux
 def encontrarMaximo(arr):
     max = 0
     for i in range(len(arr)):
@@ -19,40 +17,48 @@ def encontrarMaximo(arr):
     return max
 
 def construirCamino(optimos, caballeros):
-    resultado = []
+    resultado = set()
     pos = encontrarMaximo(optimos)
     max = optimos[pos]
-    while pos >= 0 and max > 0:
-        resultado.append(caballeros[pos-1][0])
-        max -= caballeros[pos-1][1]
+    while pos >= 0 and max != 0:
+        resultado.add(caballeros[pos][0])
+        max -= caballeros[pos][1]
         pos -= 1
     return resultado
 
-def caballerosMasPopulares(caballeros):
-    ultimoNegativo = encontrarElUltimoNegativo(caballeros)
-    caballerosReordenados = []
-    if ultimoNegativo != -1:
-        caballerosReordenados.extend(caballeros[ultimoNegativo+1:])
-        caballerosReordenados.extend(caballeros[:ultimoNegativo])
-    else:
-        caballerosReordenados = caballeros
+def kadaneAlgoritmo(caballeros):
     optimos = []
-    optimos.append(0)
-    for i in range(len(caballerosReordenados)):
-        valor = valorCaballero(caballerosReordenados[i])
-        if optimos[i] + valor >= valor:
-            optimos.append(optimos[i] + valor)
+    optimos.append(valorCaballero(caballeros[0]))
+    for i in range(1, len(caballeros)):
+        valor = valorCaballero(caballeros[i])
+        if optimos[i-1] + valor >= valor:
+            optimos.append(optimos[i-1] + valor)
         else:
             optimos.append(valor)
-    return construirCamino(optimos, caballerosReordenados)[::-1]
+    return optimos[encontrarMaximo(optimos)], construirCamino(optimos,caballeros)
+def caballerosMasPopulares(caballeros):
+    caballerosSet = set()
+    total = 0
+    for i in caballeros:
+        caballerosSet.add(nombreCaballero(i))
+        total += valorCaballero(i)
+    listaCaballerosNegativos = caballerosNegativos(caballeros)
+    max, solMax =  kadaneAlgoritmo(caballeros)
+    min, solMin = kadaneAlgoritmo(listaCaballerosNegativos)
+    min = total + min
+    if max > min:
+        return solMax
+    else:
+        return caballerosSet - solMin
+
 
 # ___ MAIN ___
 argumentos = sys.argv
-if len(argumentos) != 2:
-    print("ERROR")
-    sys.exit()
+# if len(argumentos) != 2:
+#     print("ERROR")
+#     sys.exit()
 
-with open(argumentos[1], 'r') as archivo:
+with open('caballeros.txt', 'r') as archivo:
     lineas = archivo.readlines()
 
 listaCaballeros = []
@@ -60,4 +66,8 @@ for l in lineas:
     elementos = l.strip().split(',')
     listaCaballeros.append([elementos[0], int(elementos[1])])
 
-print(caballerosMasPopulares(listaCaballeros))
+aux = caballerosMasPopulares(listaCaballeros)
+if len(aux) == 0:
+    print("No lleva a nadie")
+else:
+    print(aux)
