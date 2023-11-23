@@ -202,6 +202,7 @@ def fordFulkersonFlujoMaximo(grafo, s, t):
 def eliminarCiclosParaRedDeFlujo(grafo):
     copia = copiarGrafo(grafo)
     aristasBi = set()
+    diccionarioDeAristas = {}
     for v in grafo:
         for w in grafo.adyacentes(v):
             if grafo.existeArista(v, w) and grafo.existeArista(w, v):
@@ -212,8 +213,10 @@ def eliminarCiclosParaRedDeFlujo(grafo):
         peso = grafo.pesoArista(v,w)
         copia.borrarArista(v,w)
         copia.insertarArista(v, str(v) + str(w), peso)
+        diccionarioDeAristas[(v, str(v) + str(w))] = (v, w)
+        diccionarioDeAristas[(str(v) + str(w), w)] = (v, w)
         copia.insertarArista(str(v) + str(w), w, peso)
-    return copia
+    return copia, diccionarioDeAristas
 def flujoMaximo(flujo, t):
     max = 0
     for i in flujo:
@@ -235,7 +238,8 @@ def construirRed(aristas):
         else:
             red.insertarArista(u, v, p)
             red.insertarArista(v, u, p)
-    return eliminarCiclosParaRedDeFlujo(red), aristasDeR
+    red, dicc = eliminarCiclosParaRedDeFlujo(red)
+    return red, dicc, aristasDeR
 
 def corteMinimo(grafo, residual, s):
     padres, origen = bfs(residual, s)
@@ -265,6 +269,12 @@ def encontrarConexionOptima(red, aristasAProbar, s, t):
         red.borrarArista(o,d)
     return max, aristaUsada, aristasCorteMinimo
 
+def traducirAristasLimitantes(aristas, diccionario):
+    aux = aristas
+    for i in range(len(aristas)):
+        if aristas[i] in diccionario:
+            aux[i] = diccionario[aristas[i]]
+    return aux
 
 # __ MAIN __
 argumentos = sys.argv
@@ -280,8 +290,10 @@ for l in lineas:
     elementos = l.strip().split(',')
     aristas.append((str(elementos[0]), str(elementos[1]), int(elementos[2])))
 
-r, a = construirRed(aristas)
+r, d, a = construirRed(aristas)
 max, aristaFinal, aristasLimitantes = encontrarConexionOptima(r, a, 'R', 'S')
-print(max)
-print(aristaFinal)
-print(aristasLimitantes)
+aristasLimitantes = traducirAristasLimitantes(aristasLimitantes, d)
+print("el flujo maximo de la red usando la conexion " + str(aristaFinal) + " es de " + str(max))
+print("\nlas aristas que  limitan este flujo  y que deberian ser mejoradas son: ")
+for i in aristasLimitantes:
+    print("\t" + str(i))
