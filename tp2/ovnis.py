@@ -296,4 +296,4 @@ aristasLimitantes = traducirAristasLimitantes(aristasLimitantes, d)
 print("el flujo maximo de la red usando la conexion " + str(aristaFinal) + " es de " + str(max))
 print("\nlas aristas que  limitan este flujo  y que deberian ser mejoradas son: ")
 for i in aristasLimitantes:
-    print("\t" + str(i))
+    print("  " + str(i))
