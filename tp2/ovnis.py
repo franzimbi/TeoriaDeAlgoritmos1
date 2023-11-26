@@ -227,19 +227,17 @@ def flujoMaximo(flujo, t):
 
 def construirRed(aristas):
     red = Grafo(True, True)
-    aristasDeR = []
     for a in aristas:
         u,v, p = a
         if u == 'R':
-            red.insertarVertice(u)
-            aristasDeR.append((u, v, p))
+            red.insertarArista(u, v, p)
         elif v == 'S':
             red.insertarArista(u, v, p)
         else:
             red.insertarArista(u, v, p)
             red.insertarArista(v, u, p)
     red, dicc = eliminarCiclosParaRedDeFlujo(red)
-    return red, dicc, aristasDeR
+    return red, dicc
 
 def corteMinimo(grafo, residual, s):
     padres, origen = bfs(residual, s)
@@ -253,21 +251,11 @@ def corteMinimo(grafo, residual, s):
                 aristasCorteMinimo.append((v,w))
     return aristasCorteMinimo
 
-def encontrarConexionOptima(red, aristasAProbar, s, t):
-    max = 0
-    aristaUsada = None
-    aristasCorteMinimo = None
-    for i in aristasAProbar:
-        o, d, p = i
-        red.insertarArista(o,d,p)
-        flujo, residual = fordFulkersonFlujoMaximo(red, s, t)
-        maxLocal = flujoMaximo(flujo, t)
-        if maxLocal >= max:
-            max = maxLocal
-            aristaUsada = i
-            aristasCorteMinimo = corteMinimo(red, residual, s)
-        red.borrarArista(o,d)
-    return max, aristaUsada, aristasCorteMinimo
+def encontrarConexionOptima(red, s, t):
+    flujo, residual = fordFulkersonFlujoMaximo(red, s, t)
+    max = flujoMaximo(flujo, t)
+    aristasCorteMinimo = corteMinimo(red, residual, s)
+    return max, flujo, aristasCorteMinimo
 
 def traducirAristasLimitantes(aristas, diccionario):
     aux = aristas
@@ -276,6 +264,14 @@ def traducirAristasLimitantes(aristas, diccionario):
             aux[i] = diccionario[aristas[i]]
     return aux
 
+def imprimirFlujo(flujo, diccionario):
+    impresos = set()
+    for i in flujo:
+        if i in diccionario and diccionario[i] not in impresos:
+            print(str(diccionario[i]) + ": " + str(flujo[i]))
+            impresos.add(diccionario[i])
+        if i not in diccionario:
+            print(str(i) + ": " + str(flujo[i]))
 # __ MAIN __
 argumentos = sys.argv
 if len(argumentos) != 2:
@@ -290,10 +286,11 @@ for l in lineas:
     elementos = l.strip().split(',')
     aristas.append((str(elementos[0]), str(elementos[1]), int(elementos[2])))
 
-r, d, a = construirRed(aristas)
-max, aristaFinal, aristasLimitantes = encontrarConexionOptima(r, a, 'R', 'S')
+r, d = construirRed(aristas)
+maximo, flujo, aristasLimitantes = encontrarConexionOptima(r,'R', 'S')
 aristasLimitantes = traducirAristasLimitantes(aristasLimitantes, d)
-print("el flujo maximo de la red usando la conexion " + str(aristaFinal) + " es de " + str(max))
+print("el flujo maximo de la red es: " + str(maximo) +". con los flujos por arista: ")
+imprimirFlujo(flujo, d)
 print("\nlas aristas que  limitan este flujo  y que deberian ser mejoradas son: ")
 for i in aristasLimitantes:
     print("  " + str(i))
